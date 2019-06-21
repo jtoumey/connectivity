@@ -57,6 +57,9 @@ int main (void)
 
     Geometry geom(grid_inputs);
 
+    geom.calculateVertices();
+    geom.calculateCellCenters();
+
     return(0);
 }
 
