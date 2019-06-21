@@ -179,14 +179,22 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
         }
         else
         {
-            if (neighbor_cell_index != current_cell_index)
+            // Loop over vertices of this shared cell 
+            for (int nn = 0; nn < 4; ++nn)
             {
-                neighbor_count++;
-                
+                // If this shared cell also possesses the end end vertex and is NOT the cell of interest itself, then the face
+                // has a neighbor
+                if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index != current_cell_index)
+                {
+                    neighbor_count++;
+                }
+                else
+                {
+                    continue;
+                }
+
             }
-            // // Loop over vertices of this shared cell 
-            // for (int nn = 0; nn < 4; ++nn)
-            // {
+
 
             //     if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index > current_cell_index)
             //     {
@@ -198,33 +206,9 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
             //     {
             //         edge_validity = 1;
             //     }
-
-                //     neighbor_count++;
-
-                //     if (current_cell_index < neighbor_cell_index)
-                //     {
-                //         std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl;
-                //     }
-                //     else if (current_cell_index > neighbor_cell_index)
-                //     {
-                //         std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") was already stored." << std::endl;
-                //     }
-                //     else if (current_cell_index == neighbor_cell_index)
-                //     {
-                //         std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique and on a boundary." << std::endl;
-                //     }
-                // }
-                // else if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index == current_cell_index )
-                // {
-                //     if (current_cell_index )
-                //     {
-                //         std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique and on a boundary." << std::endl;
-                //     }
-                // }             
-            // }
         }
     }
-    return(edge_validity);
+    return(neighbor_count);
     // std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") has " << neighbor_count << " neighbors." << std::endl;
 }
 
@@ -239,24 +223,28 @@ void Geometry::generateEdgeList()
 
         //create the edge here
         // return a boolean for if edge is unique
-        int s_edge_validity = findFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
+        int neighbor_count = findFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
 
-        if (s_edge_validity == 1)
+        if (neighbor_count > 0)
         {
-            std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") is unique." << std::endl;
+            std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") has two neighbors." << std::endl;
             // if yes, push onto edge list
+        }
+        else
+        {
+            std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") is on a boundary." << std::endl;   
         }
 
 
-        int ne_vertex_index = cell_centers[ii].neighbors[2];
+        // int ne_vertex_index = cell_centers[ii].neighbors[2];
 
-        findFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+        // findFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
 
-        int nw_vertex_index = cell_centers[ii].neighbors[3];
+        // int nw_vertex_index = cell_centers[ii].neighbors[3];
 
-        findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
+        // findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
 
-        findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
+        // findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
 
     }
 }
