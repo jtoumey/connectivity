@@ -236,15 +236,42 @@ void Geometry::generateEdgeList()
         }
 
 
-        // int ne_vertex_index = cell_centers[ii].neighbors[2];
+        int ne_vertex_index = cell_centers[ii].neighbors[2];
 
-        // findFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+        neighbor_count = findFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+        if (neighbor_count > 0)
+        {
+            std::cout << "Edge with vertices (" << se_vertex_index << ", " << ne_vertex_index << ") has two neighbors." << std::endl;
+            // if yes, push onto edge list
+        }
+        else
+        {
+            std::cout << "Edge with vertices (" << se_vertex_index << ", " << ne_vertex_index << ") is on a boundary." << std::endl;   
+        }
 
-        // int nw_vertex_index = cell_centers[ii].neighbors[3];
+        int nw_vertex_index = cell_centers[ii].neighbors[3];
 
-        // findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
+        neighbor_count = findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
+        if (neighbor_count > 0)
+        {
+            std::cout << "Edge with vertices (" << ne_vertex_index << ", " << nw_vertex_index << ") has two neighbors." << std::endl;
+            // if yes, push onto edge list
+        }
+        else
+        {
+            std::cout << "Edge with vertices (" << ne_vertex_index << ", " << nw_vertex_index << ") is on a boundary." << std::endl;   
+        }
 
-        // findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
+        neighbor_count = findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
+        if (neighbor_count > 0)
+        {
+            std::cout << "Edge with vertices (" << nw_vertex_index << ", " << sw_vertex_index << ") has two neighbors." << std::endl;
+            // if yes, push onto edge list
+        }
+        else
+        {
+            std::cout << "Edge with vertices (" << nw_vertex_index << ", " << sw_vertex_index << ") is on a boundary." << std::endl;   
+        }
 
     }
 }
