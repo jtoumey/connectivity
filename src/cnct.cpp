@@ -10,7 +10,7 @@ struct Parameters
     double dx, dy;
     int num_verts;
 
-    Parameters(int x_, int y_, int nx_, int ny_) : 
+    Parameters(double x_, double y_, int nx_, int ny_) : 
         x(x_), y(y_), nx(nx_), ny(ny_) {}
 };
 
@@ -52,10 +52,16 @@ int main (void)
 
     grid_inputs.np = grid_inputs.nx*grid_inputs.ny;
     grid_inputs.num_verts = (grid_inputs.nx + 1)*(grid_inputs.ny + 1);
-    grid_inputs.dx = grid_inputs.x/grid_inputs.nx;
-    grid_inputs.dy = grid_inputs.y/grid_inputs.ny;
+    grid_inputs.dx = grid_inputs.x/(float)(grid_inputs.nx);
+    grid_inputs.dy = grid_inputs.y/(float)(grid_inputs.ny);
 
     Geometry geom(grid_inputs);
+
+    geom.calculateVertices();
+    geom.calculateCellCenters();
+    geom.calculateConnectivity();
+
+    geom.generateEdgeList();
 
     return(0);
 }
@@ -107,6 +113,7 @@ void Geometry::calculateCellCenters()
     {
         std::cout << ii << ": " << cell_centers[ii].x << ", " << cell_centers[ii].y << std::endl;
     }
+    std::cout << std::endl;
 }
 
 void Geometry::calculateConnectivity()
@@ -125,13 +132,13 @@ void Geometry::calculateConnectivity()
             {
                 if (std::fabs((cc.y - geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << "match with SW vert " << jj << " in x" << std::endl;
+                    std::cout << "Cell " << ii << " match with SW vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[0] = jj;
                     vertices[jj].neighbors[1] = ii;
                 }
                 else if (std::fabs((cc.y + geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << "match with NW vert " << jj << " in x" << std::endl;
+                    std::cout << "Cell " << ii << " match with NW vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[3] = jj;
                     vertices[jj].neighbors[0] = ii;
                 }
@@ -140,18 +147,19 @@ void Geometry::calculateConnectivity()
             {
                 if (std::fabs((cc.y - geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << "match with SE vert " << jj << " in x" << std::endl;
+                    std::cout << "Cell " << ii << " match with SE vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[1] = jj;
                     vertices[jj].neighbors[2] = ii;
                 }
                 else if (std::fabs((cc.y + geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << "match with NE vert " << jj << " in x" << std::endl;
+                    std::cout << "Cell " << ii << " match with NE vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[2] = jj;
                     vertices[jj].neighbors[3] = ii;
                 }
             }
         }
+        std::cout << std::endl;
     }
 }
 
