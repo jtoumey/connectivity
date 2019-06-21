@@ -22,8 +22,8 @@ struct Node
 
 struct Edge
 {
-    int e_start;
-    int e_end;
+    int start_vertex;
+    int end_vertex;
 };
 
 class Geometry
@@ -43,7 +43,7 @@ public:
     void calculateConnectivity();
     void generateEdgeList();
     int findFaceNeighbors(int, int, int);
-
+    int getFaceNeighbors(int, int, int);
 };
 
 int main (void)
@@ -165,7 +165,6 @@ void Geometry::calculateConnectivity()
 
 int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
 {
-    int edge_validity;
     int neighbor_count = 0;
     // Loop over the four (at maximum) cells connected to the edge start vertex
     for (int jj = 0; jj < 4; ++jj)
@@ -187,6 +186,11 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
                 if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index != current_cell_index)
                 {
                     neighbor_count++;
+
+                    if (current_cell_index < neighbor_cell_index)
+                    {
+                        std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl; 
+                    }
                 }
                 else
                 {
@@ -194,22 +198,50 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
                 }
 
             }
-
-
-            //     if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index > current_cell_index)
-            //     {
-            //         std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is not valid." << std::endl;
-
-            //         edge_validity = 0;
-            //     }
-            //     else
-            //     {
-            //         edge_validity = 1;
-            //     }
         }
     }
     return(neighbor_count);
-    // std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") has " << neighbor_count << " neighbors." << std::endl;
+}
+
+int Geometry::getFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
+{
+    int unique_neighbor = 0;
+
+    // Loop over the four (at maximum) cells connected to the edge start vertex
+    for (int jj = 0; jj < 4; ++jj)
+    {
+        int neighbor_cell_index = vertices[edge_start_vert].neighbors[jj];
+
+        // Some vertices don't have neighbors in particular quadrants
+        if (neighbor_cell_index == -1)
+        {
+            continue;
+        }
+        else
+        {
+            // Loop over vertices of this shared cell 
+            for (int nn = 0; nn < 4; ++nn)
+            {
+                // If this shared cell also possesses the end end vertex and is NOT the cell of interest itself, then the face
+                // has a neighbor
+                if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert)
+                {
+                    if (current_cell_index < neighbor_cell_index)
+                    {
+                        std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl; 
+
+                        unique_neighbor = 1;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+        }
+    }
+    return(unique_neighbor);
 }
 
 void Geometry::generateEdgeList()
@@ -222,17 +254,35 @@ void Geometry::generateEdgeList()
         int se_vertex_index = cell_centers[ii].neighbors[1];
 
         //create the edge here
+        Edge edge_c;
+        edge_c.start_vertex = sw_vertex_index;
+        edge_c.end_vertex = se_vertex_index;
+
         // return a boolean for if edge is unique
         int neighbor_count = findFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
 
         if (neighbor_count > 0)
         {
             std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") has two neighbors." << std::endl;
-            // if yes, push onto edge list
+            // if yes, loop again and test for uniqueness
+            int unique_nbr_flag = getFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
+
+            if (unique_nbr_flag == 1)
+            {
+                std::cout << "  This edge is also unique." << std::endl;
+
+                edge_list.push_back(edge_c);
+            }
+            else
+            {
+                continue;
+            }
         }
         else
         {
-            std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") is on a boundary." << std::endl;   
+            std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") is on a boundary and hence unique." << std::endl;
+
+            edge_list.push_back(edge_c);   
         }
 
 
