@@ -174,7 +174,7 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
         // Some vertices don't have neighbors in particular quadrants
         if (neighbor_cell_index == -1)
         {
-            continue;
+            //continue;
         }
         else
         {
@@ -194,9 +194,8 @@ int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int
                 }
                 else
                 {
-                    continue;
+                    //continue;
                 }
-
             }
         }
     }
@@ -215,7 +214,7 @@ int Geometry::getFaceNeighbors(int current_cell_index, int edge_start_vert, int 
         // Some vertices don't have neighbors in particular quadrants
         if (neighbor_cell_index == -1)
         {
-            continue;
+            // continue;
         }
         else
         {
@@ -232,9 +231,8 @@ int Geometry::getFaceNeighbors(int current_cell_index, int edge_start_vert, int 
                 }
                 else
                 {
-                    continue;
+                    //continue;
                 }
-
             }
         }
     }
@@ -262,9 +260,14 @@ void Geometry::generateEdgeList()
         {
             edge_list.push_back(edge_c);
         }
-        else
+        else 
         {
-            
+            int unique_neighbor_flag = getFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
+
+            if (unique_neighbor_flag == 1)
+            {
+                edge_list.push_back(edge_c);
+            }
         }
         
         // For an East face of the cell, collect the SE and NE vertices as the start and end
@@ -281,210 +284,61 @@ void Geometry::generateEdgeList()
         {
             edge_list.push_back(edge_c);
         }
-        else
+        else 
         {
-       
+            int unique_neighbor_flag = getFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+
+            if (unique_neighbor_flag == 1)
+            {
+                edge_list.push_back(edge_c);
+            }
         }
-        // else
-        // {
-        //     std::cout << "Edge with vertices (" << sw_vertex_index << ", " << se_vertex_index << ") is on a boundary and hence unique." << std::endl;
 
-        //     edge_list.push_back(edge_c);   
-        // }
+        // For a North face of the cell, collect the NE and NW vertices as the start and end
+        int nw_vertex_index = cell_centers[ii].neighbors[3];
 
+        //create the edge here
+        edge_c.start_vertex = ne_vertex_index;
+        edge_c.end_vertex = nw_vertex_index;
 
-        // int ne_vertex_index = cell_centers[ii].neighbors[2];
+        // return a boolean for if edge is unique
+        neighbor_count = findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
 
-        // //create the edge here
-        // edge_c.start_vertex = se_vertex_index;
-        // edge_c.end_vertex = ne_vertex_index;
+        if (neighbor_count == 0)
+        {
+            edge_list.push_back(edge_c);
+        }
+        else 
+        {
+            int unique_neighbor_flag = getFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
 
-        // neighbor_count = findFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
-        // if (neighbor_count > 0)
-        // {
-        //     std::cout << "Edge with vertices (" << se_vertex_index << ", " << ne_vertex_index << ") has two neighbors." << std::endl;
-        //     // if yes, loop again and test for uniqueness
-        //     int unique_nbr_flag = getFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+            if (unique_neighbor_flag == 1)
+            {
+                edge_list.push_back(edge_c);
+            }
+        }
 
-        //     if (unique_nbr_flag == 1)
-        //     {
-        //         std::cout << "  This edge is also unique." << std::endl;
+        // For a West face of the cell, collect the NW and SW vertices as the start and end
 
-        //         edge_list.push_back(edge_c);
-        //     }
-        //     else
-        //     {
-        //         continue;
-        //     }
-        // }
-        // else
-        // {
-        //     std::cout << "Edge with vertices (" << se_vertex_index << ", " << ne_vertex_index << ") is on a boundary and hence unique." << std::endl;
-        //     edge_list.push_back(edge_c);
-        // }
+        //create the edge here
+        edge_c.start_vertex = nw_vertex_index;
+        edge_c.end_vertex = sw_vertex_index;
 
-        // int nw_vertex_index = cell_centers[ii].neighbors[3];
+        // return a boolean for if edge is unique
+        neighbor_count = findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
 
-        // edge_c.start_vertex = ne_vertex_index;
-        // edge_c.end_vertex = nw_vertex_index;
+        if (neighbor_count == 0)
+        {
+            edge_list.push_back(edge_c);
+        }
+        else 
+        {
+            int unique_neighbor_flag = getFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
 
-        // neighbor_count = findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
-        // if (neighbor_count > 0)
-        // {
-        //     std::cout << "Edge with vertices (" << ne_vertex_index << ", " << nw_vertex_index << ") has two neighbors." << std::endl;
-        //     // if yes, loop again and test for uniqueness
-        //     int unique_nbr_flag = getFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
-
-        //     if (unique_nbr_flag == 1)
-        //     {
-        //         std::cout << "  This edge is also unique." << std::endl;
-
-        //         edge_list.push_back(edge_c);
-        //     }
-        //     else
-        //     {
-        //         continue;
-        //     }
-        // }
-        // else
-        // {
-        //     std::cout << "Edge with vertices (" << ne_vertex_index << ", " << nw_vertex_index << ") is on a boundary and hence unique." << std::endl;
-        //     edge_list.push_back(edge_c); 
-        // }
-
-        // edge_c.start_vertex = nw_vertex_index;
-        // edge_c.end_vertex = sw_vertex_index;
-
-
-        // neighbor_count = findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
-        // if (neighbor_count > 0)
-        // {
-        //     std::cout << "Edge with vertices (" << nw_vertex_index << ", " << sw_vertex_index << ") has two neighbors." << std::endl;
-        //     // if yes, loop again and test for uniqueness
-        //     int unique_nbr_flag = getFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
-
-        //     if (unique_nbr_flag == 1)
-        //     {
-        //         std::cout << "  This edge is also unique." << std::endl;
-
-        //         edge_list.push_back(edge_c);
-        //     }
-        //     else
-        //     {
-        //         continue;
-        //     }
-        // }
-        // else
-        // {
-        //     std::cout << "Edge with vertices (" << nw_vertex_index << ", " << sw_vertex_index << ") is on a boundary." << std::endl;
-        //     edge_list.push_back(edge_c);
-
-        // }
-
+            if (unique_neighbor_flag == 1)
+            {
+                edge_list.push_back(edge_c);
+            }
+        }
     }
 }
-
-    //     int ne_vertex_index = cell_centers[ii].neighbors[2];
-
-    //     // Loop over cells that use the sw_vertex_index 
-    //     for (int jj = 0; jj < 4; ++jj)
-    //     {
-    //         int neighbor_cell_index = vertices[se_vertex_index].neighbors[jj];
-
-    //         // some vertices don't have neighbors in particular quadrants
-    //         if (neighbor_cell_index == -1)
-    //         {
-    //             continue;
-    //         }
-    //         else
-    //         {
-    //             // Loop over associated vertices of cells that contain sw_vertex_index
-    //             for (int nn = 0; nn < 4; ++nn)
-    //             {
-    //                 if (cell_centers[neighbor_cell_index].neighbors[nn] == ne_vertex_index && neighbor_cell_index != ii)
-    //                 {
-    //                     std::cout << "Found a n-s edge with a neighbor: verts ( " << se_vertex_index << ", " << ne_vertex_index << ")" << std::endl;
-    //                     std::cout << "  Neighbor:" << ii << "(parent cell), with " << neighbor_cell_index << std::endl;
-
-    //                     if (ii < neighbor_cell_index)
-    //                     {
-    //                         std::cout << "Found a unique edge:" << std::endl;
-    //                     }
-    //                 }
-    //                 else
-    //                 {
-    //                     continue;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     int nw_vertex_index = cell_centers[ii].neighbors[3];
-    //     // Loop over cells that use the sw_vertex_index 
-    //     for (int jj = 0; jj < 4; ++jj)
-    //     {
-    //         int neighbor_cell_index = vertices[ne_vertex_index].neighbors[jj];
-
-    //         // some vertices don't have neighbors in particular quadrants
-    //         if (neighbor_cell_index == -1)
-    //         {
-    //             continue;
-    //         }
-    //         else
-    //         {
-    //             // Loop over associated vertices of cells that contain sw_vertex_index
-    //             for (int nn = 0; nn < 4; ++nn)
-    //             {
-    //                 if (cell_centers[neighbor_cell_index].neighbors[nn] == nw_vertex_index && neighbor_cell_index != ii)
-    //                 {
-    //                     std::cout << "Found a n-s edge with a neighbor: verts ( " << ne_vertex_index << ", " << nw_vertex_index << ")" << std::endl;
-    //                     std::cout << "  Neighbor:" << ii << "(parent cell), with " << neighbor_cell_index << std::endl;
-
-    //                     if (ii < neighbor_cell_index)
-    //                     {
-    //                         std::cout << "Found a unique edge:" << std::endl;
-    //                     }
-    //                 }
-    //                 else
-    //                 {
-    //                     continue;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-
-    //     // Loop over cells that use the sw_vertex_index 
-    //     for (int jj = 0; jj < 4; ++jj)
-    //     {
-    //         int neighbor_cell_index = vertices[nw_vertex_index].neighbors[jj];
-
-    //         // some vertices don't have neighbors in particular quadrants
-    //         if (neighbor_cell_index == -1)
-    //         {
-    //             continue;
-    //         }
-    //         else
-    //         {
-    //             // Loop over associated vertices of cells that contain sw_vertex_index
-    //             for (int nn = 0; nn < 4; ++nn)
-    //             {
-    //                 if (cell_centers[neighbor_cell_index].neighbors[nn] == sw_vertex_index && neighbor_cell_index != ii)
-    //                 {
-    //                     std::cout << "Found a n-s edge with a neighbor: verts ( " << nw_vertex_index << ", " << sw_vertex_index << ")" << std::endl;
-    //                     std::cout << "  Neighbor:" << ii << "(parent cell), with " << neighbor_cell_index << std::endl;
-
-    //                     if (ii < neighbor_cell_index)
-    //                     {
-    //                         std::cout << "Found a unique edge:" << std::endl;
-    //                     }
-    //                 }
-    //                 else
-    //                 {
-    //                     continue;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // }
