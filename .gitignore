@@ -2,6 +2,9 @@
 *.o
 *.out
 
+# Data Files
+*.dat
+
 # MacOS
 *.DS_Store
 *.dSYM

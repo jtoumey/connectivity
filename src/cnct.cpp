@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 
 struct Parameters
 {
@@ -353,5 +354,14 @@ void Geometry::writeEdgeList()
     for (int ii = 0; ii < num_edges; ++ii)
     {
         std::cout << "Edge #: " << ii << "; Vertices: (" << edge_list[ii].start_vertex << ", " << edge_list[ii].end_vertex << ")" << std::endl;
-    }  
-}
+    }
+
+    std::ofstream edge_list_output;
+    edge_list_output.open("edge_list.dat");
+
+    for (size_t ii = 0; ii < num_edges; ++ii)
+    {
+        edge_list_output << "Edge #: " << ii << "; Vertices: (" << edge_list[ii].start_vertex << ", " << edge_list[ii].end_vertex << ")" << std::endl;
+    }
+    edge_list_output.close();
+} 
