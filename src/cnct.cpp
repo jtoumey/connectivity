@@ -44,6 +44,8 @@ public:
     void generateEdgeList();
     int findFaceNeighbors(int, int, int);
     int getFaceNeighbors(int, int, int);
+
+    void writeEdgeList();
 };
 
 int main (void)
@@ -62,6 +64,7 @@ int main (void)
     geom.calculateConnectivity();
 
     geom.generateEdgeList();
+    geom.writeEdgeList();
 
     return(0);
 }
@@ -341,4 +344,14 @@ void Geometry::generateEdgeList()
             }
         }
     }
+}
+
+void Geometry::writeEdgeList()
+{
+    int num_edges = edge_list.size();
+    // Loop over all cells
+    for (int ii = 0; ii < num_edges; ++ii)
+    {
+        std::cout << "Edge #: " << ii << "; Vertices: (" << edge_list[ii].start_vertex << ", " << edge_list[ii].end_vertex << ")" << std::endl;
+    }  
 }
