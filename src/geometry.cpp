@@ -185,17 +185,22 @@ void Geometry::determineCellEdgeAssociation()
 {
     for (size_t ii = 0; ii < geometry_params.np; ++ii)
     {
-        Edge south_edge;
-        south_edge.start_vertex = cell_centers[ii].neighbors[0];
-        south_edge.end_vertex = cell_centers[ii].neighbors[1];
 
-        size_t num_edges = edge_list.size();
-        for (size_t jj = 0; jj < num_edges; ++jj)
+        for (size_t jj = 0; jj < 4; ++jj)
         {
-            if ((south_edge.start_vertex == edge_list[jj].start_vertex && south_edge.end_vertex == edge_list[jj].end_vertex) || (south_edge.start_vertex == edge_list[jj].end_vertex && south_edge.end_vertex == edge_list[jj].start_vertex))
+            Edge current_edge;
+            current_edge.start_vertex = cell_centers[ii].neighbors[jj];
+            current_edge.end_vertex = cell_centers[ii].neighbors[(jj+1)%4];
+            size_t num_edges = edge_list.size();
+
+            for (size_t kk = 0; kk < num_edges; ++kk)
             {
-                std::cout << "Cell " << ii << " has S edge ID" << jj << " which has verts (" << edge_list[jj].start_vertex << ", " << edge_list[jj].end_vertex << ")" << std::endl;
+                if ((current_edge.start_vertex == edge_list[kk].start_vertex && current_edge.end_vertex == edge_list[kk].end_vertex) || (current_edge.start_vertex == edge_list[kk].end_vertex && current_edge.end_vertex == edge_list[kk].start_vertex))
+                {
+                    std::cout << "Cell " << ii << " has cardinal dir " << jj << " edge ID" << kk << " which has verts (" << edge_list[kk].start_vertex << ", " << edge_list[kk].end_vertex << ")" << std::endl;
+                }
             }
+
         }
     }
 
