@@ -25,6 +25,7 @@ struct Edge
 {
     int start_vertex;
     int end_vertex;
+    int cell_neighbors[2] = {-1, -1};
 };
 
 struct UniqueEdgeStatus

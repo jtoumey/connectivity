@@ -206,4 +206,26 @@ void Geometry::determineCellEdgeAssociation()
         }
     }
 
+    size_t num_edges = edge_list.size();
+    for (size_t edge_id = 0; edge_id < num_edges; ++edge_id)
+    {
+        for (size_t cell_id = 0; cell_id < geometry_params.np; ++cell_id)
+        {
+            for (size_t face_dir = 0; face_dir < 4; ++face_dir)
+            {
+                if (cell_centers[cell_id].edge_neighbors[face_dir] == edge_id)
+                {
+                    if (edge_list[edge_id].cell_neighbors[0] == -1)
+                    {
+                        edge_list[edge_id].cell_neighbors[0] = cell_id;
+                    }
+                    else
+                    {
+                        edge_list[edge_id].cell_neighbors[1] = cell_id;
+                    }
+                }
+            }
+        }
+    }
+
 }
