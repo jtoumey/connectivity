@@ -284,13 +284,11 @@ int Geometry::getFaceNeighbors(int current_cell_index, int edge_start_vert, int 
                 // has a neighbor
                 if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && current_cell_index < neighbor_cell_index)
                 {
-                    std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl; 
-
                     unique_neighbor = 1;
                 }
                 else
                 {
-                    //continue;
+
                 }
             }
         }
@@ -344,20 +342,11 @@ void Geometry::generateEdgeList()
         edge_c.end_vertex = nw_vertex_index;
 
         // return a boolean for if edge is unique
-        neighbor_count = findFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
+        current_edge = findUniqueFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
 
-        if (neighbor_count == 0)
+        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
-        }
-        else 
-        {
-            int unique_neighbor_flag = getFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
-
-            if (unique_neighbor_flag == 1)
-            {
-                edge_list.push_back(edge_c);
-            }
         }
 
         // For a West face of the cell, collect the NW and SW vertices as the start and end
@@ -367,20 +356,11 @@ void Geometry::generateEdgeList()
         edge_c.end_vertex = sw_vertex_index;
 
         // return a boolean for if edge is unique
-        neighbor_count = findFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
+        current_edge = findUniqueFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
 
-        if (neighbor_count == 0)
+        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
-        }
-        else 
-        {
-            int unique_neighbor_flag = getFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
-
-            if (unique_neighbor_flag == 1)
-            {
-                edge_list.push_back(edge_c);
-            }
         }
     }
 }
