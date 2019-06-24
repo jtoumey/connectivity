@@ -198,6 +198,8 @@ void Geometry::determineCellEdgeAssociation()
                 if ((current_edge.start_vertex == edge_list[kk].start_vertex && current_edge.end_vertex == edge_list[kk].end_vertex) || (current_edge.start_vertex == edge_list[kk].end_vertex && current_edge.end_vertex == edge_list[kk].start_vertex))
                 {
                     std::cout << "Cell " << ii << " has cardinal dir " << jj << " edge ID" << kk << " which has verts (" << edge_list[kk].start_vertex << ", " << edge_list[kk].end_vertex << ")" << std::endl;
+                    
+                    cell_centers[ii].edge_neighbors[jj] = kk;
                 }
             }
 

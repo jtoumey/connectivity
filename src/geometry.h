@@ -18,6 +18,7 @@ struct Node
 {
     double x, y;
     int neighbors[4] = {-1, -1, -1, -1};
+    int edge_neighbors[4] = {-1, -1, -1, -1};
 };
 
 struct Edge
