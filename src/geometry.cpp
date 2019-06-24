@@ -192,7 +192,7 @@ void Geometry::determineCellEdgeAssociation()
         size_t num_edges = edge_list.size();
         for (size_t jj = 0; jj < num_edges; ++jj)
         {
-            if (south_edge.start_vertex == edge_list[jj].start_vertex && south_edge.end_vertex == edge_list[jj].end_vertex)
+            if ((south_edge.start_vertex == edge_list[jj].start_vertex && south_edge.end_vertex == edge_list[jj].end_vertex) || (south_edge.start_vertex == edge_list[jj].end_vertex && south_edge.end_vertex == edge_list[jj].start_vertex))
             {
                 std::cout << "Cell " << ii << " has S edge ID" << jj << " which has verts (" << edge_list[jj].start_vertex << ", " << edge_list[jj].end_vertex << ")" << std::endl;
             }
