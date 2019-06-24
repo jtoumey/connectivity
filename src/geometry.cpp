@@ -183,23 +183,22 @@ void Geometry::writeEdgeList()
 
 void Geometry::determineCellEdgeAssociation()
 {
-    for (size_t ii = 0; ii < geometry_params.np; ++ii)
+    for (size_t cell_id = 0; cell_id < geometry_params.np; ++cell_id)
     {
 
-        for (size_t jj = 0; jj < 4; ++jj)
+        for (size_t face_dir = 0; face_dir < 4; ++face_dir)
         {
             Edge current_edge;
-            current_edge.start_vertex = cell_centers[ii].neighbors[jj];
-            current_edge.end_vertex = cell_centers[ii].neighbors[(jj+1)%4];
+            current_edge.start_vertex = cell_centers[cell_id].neighbors[face_dir];
+            current_edge.end_vertex = cell_centers[cell_id].neighbors[(face_dir+1)%4];
             size_t num_edges = edge_list.size();
 
-            for (size_t kk = 0; kk < num_edges; ++kk)
+            for (size_t edge_id = 0; edge_id < num_edges; ++edge_id)
             {
-                if ((current_edge.start_vertex == edge_list[kk].start_vertex && current_edge.end_vertex == edge_list[kk].end_vertex) || (current_edge.start_vertex == edge_list[kk].end_vertex && current_edge.end_vertex == edge_list[kk].start_vertex))
-                {
-                    std::cout << "Cell " << ii << " has cardinal dir " << jj << " edge ID" << kk << " which has verts (" << edge_list[kk].start_vertex << ", " << edge_list[kk].end_vertex << ")" << std::endl;
-                    
-                    cell_centers[ii].edge_neighbors[jj] = kk;
+                // Find an edge with the same start and end vertices (test both orderings)
+                if ((current_edge.start_vertex == edge_list[edge_id].start_vertex && current_edge.end_vertex == edge_list[edge_id].end_vertex) || (current_edge.start_vertex == edge_list[edge_id].end_vertex && current_edge.end_vertex == edge_list[edge_id].start_vertex))
+                {   
+                    cell_centers[cell_id].edge_neighbors[face_dir] = edge_id;
                 }
             }
 
