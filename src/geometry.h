@@ -49,6 +49,7 @@ public:
     void calculateConnectivity();
     void generateEdgeList();
     UniqueEdgeStatus findUniqueFaceNeighbors(int, int, int);
+    void determineCellEdgeAssociation();
 
     void writeEdgeList();
 };

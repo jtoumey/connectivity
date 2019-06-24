@@ -3,6 +3,8 @@
 #include <cmath>
 #include <fstream>
 
+#include <iostream> // TODO: print to screen, so remove when done
+
 void Geometry::calculateVertices()
 {
     double xc = 0.0; 
@@ -178,3 +180,23 @@ void Geometry::writeEdgeList()
     }
     edge_list_output.close();
 } 
+
+void Geometry::determineCellEdgeAssociation()
+{
+    for (size_t ii = 0; ii < geometry_params.np; ++ii)
+    {
+        Edge south_edge;
+        south_edge.start_vertex = cell_centers[ii].neighbors[0];
+        south_edge.end_vertex = cell_centers[ii].neighbors[1];
+
+        size_t num_edges = edge_list.size();
+        for (size_t jj = 0; jj < num_edges; ++jj)
+        {
+            if (south_edge.start_vertex == edge_list[jj].start_vertex && south_edge.end_vertex == edge_list[jj].end_vertex)
+            {
+                std::cout << "Cell " << ii << " has S edge ID" << jj << " which has verts (" << edge_list[jj].start_vertex << ", " << edge_list[jj].end_vertex << ")" << std::endl;
+            }
+        }
+    }
+
+}

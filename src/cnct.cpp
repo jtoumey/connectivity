@@ -18,5 +18,7 @@ int main (void)
     geom.generateEdgeList();
     geom.writeEdgeList();
 
+    geom.determineCellEdgeAssociation();
+
     return(0);
 }
