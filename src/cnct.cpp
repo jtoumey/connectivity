@@ -218,58 +218,21 @@ void Geometry::generateEdgeList()
     // Loop over all cells
     for (int ii = 0; ii < geometry_params.np; ++ii)
     {
-        int neighbor_count = 0;
-        // For a South face of the cell, collect the SW and SE vertices as the start and end
-        int sw_vertex_index = cell_centers[ii].neighbors[0];
-        int se_vertex_index = cell_centers[ii].neighbors[1];
-
-        Edge edge_c;
-        edge_c.start_vertex = sw_vertex_index;
-        edge_c.end_vertex = se_vertex_index;
-
-        UniqueEdgeStatus edge_status = findUniqueFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
-
-        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
+        for (int jj = 0; jj < 4; ++jj)
         {
-            edge_list.push_back(edge_c);
-        }
-        
-        // For an East face of the cell, collect the SE and NE vertices as the start and end
-        int ne_vertex_index = cell_centers[ii].neighbors[2];
+            int e_start_vertex = cell_centers[ii].neighbors[jj];
+            int e_end_vertex = cell_centers[ii].neighbors[(jj+1)%4];
 
-        //create the edge here
-        edge_c.start_vertex = se_vertex_index;
-        edge_c.end_vertex = ne_vertex_index;
+            Edge edge_c;
+            edge_c.start_vertex = e_start_vertex;
+            edge_c.end_vertex = e_end_vertex;
 
-        edge_status = findUniqueFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+            UniqueEdgeStatus edge_status = findUniqueFaceNeighbors(ii, e_start_vertex, e_end_vertex);
 
-        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
-        {
-            edge_list.push_back(edge_c);
-        }
-
-        // For a North face of the cell, collect the NE and NW vertices as the start and end
-        int nw_vertex_index = cell_centers[ii].neighbors[3];
-
-        edge_c.start_vertex = ne_vertex_index;
-        edge_c.end_vertex = nw_vertex_index;
-
-        edge_status = findUniqueFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
-
-        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
-        {
-            edge_list.push_back(edge_c);
-        }
-
-        // For a West face of the cell, collect the NW and SW vertices as the start and end
-        edge_c.start_vertex = nw_vertex_index;
-        edge_c.end_vertex = sw_vertex_index;
-
-        edge_status = findUniqueFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
-
-        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
-        {
-            edge_list.push_back(edge_c);
+            if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
+            {
+                edge_list.push_back(edge_c);
+            }
         }
     }
 }
