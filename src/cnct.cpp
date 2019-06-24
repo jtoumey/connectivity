@@ -27,7 +27,7 @@ struct Edge
     int end_vertex;
 };
 
-struct UniqueEdge
+struct UniqueEdgeStatus
 {
     int unique_neighbor;
     int neighbor_count;
@@ -49,9 +49,7 @@ public:
     void calculateCellCenters();
     void calculateConnectivity();
     void generateEdgeList();
-    int findFaceNeighbors(int, int, int);
-    int getFaceNeighbors(int, int, int);
-    UniqueEdge findUniqueFaceNeighbors(int, int, int);
+    UniqueEdgeStatus findUniqueFaceNeighbors(int, int, int);
 
     void writeEdgeList();
 };
@@ -120,11 +118,6 @@ void Geometry::calculateCellCenters()
         xc += geometry_params.dx;
         yc = 0.0 + geometry_params.dy/2.0;
     }
-    for (int ii = 0; ii < geometry_params.np; ++ii)
-    {
-        std::cout << ii << ": " << cell_centers[ii].x << ", " << cell_centers[ii].y << std::endl;
-    }
-    std::cout << std::endl;
 }
 
 void Geometry::calculateConnectivity()
@@ -143,13 +136,11 @@ void Geometry::calculateConnectivity()
             {
                 if (std::fabs((cc.y - geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << " match with SW vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[0] = jj;
                     vertices[jj].neighbors[1] = ii;
                 }
                 else if (std::fabs((cc.y + geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << " match with NW vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[3] = jj;
                     vertices[jj].neighbors[0] = ii;
                 }
@@ -158,142 +149,68 @@ void Geometry::calculateConnectivity()
             {
                 if (std::fabs((cc.y - geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << " match with SE vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[1] = jj;
                     vertices[jj].neighbors[2] = ii;
                 }
                 else if (std::fabs((cc.y + geometry_params.dy/2.0) - vc.y) < eps)
                 {
-                    std::cout << "Cell " << ii << " match with NE vert " << jj << " in x" << std::endl;
                     cell_centers[ii].neighbors[2] = jj;
                     vertices[jj].neighbors[3] = ii;
                 }
             }
         }
-        std::cout << std::endl;
     }
 }
 
-UniqueEdge Geometry::findUniqueFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
+UniqueEdgeStatus Geometry::findUniqueFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
 {
-    UniqueEdge current_edge;
+    UniqueEdgeStatus current_edge_status;
 
     int neighbor_count = 0;
     int unique_neighbor = 0;
+
     // Loop over the four (at maximum) cells connected to the edge start vertex
     for (int jj = 0; jj < 4; ++jj)
     {
         int neighbor_cell_index = vertices[edge_start_vert].neighbors[jj];
 
-        // Some vertices don't have neighbors in particular quadrants
+        
         if (neighbor_cell_index == -1)
         {
-            //continue;
+            // Some vertices don't have neighbors in particular quadrants, so we skip these
         }
         else
         {
             // Loop over vertices of this shared cell 
             for (int nn = 0; nn < 4; ++nn)
             {
-                // If this shared cell also possesses the end end vertex and is NOT the cell of interest itself, then the face
+                // If this shared cell also possesses the edge end vertex and is NOT the cell of interest itself, then the current face
                 // has a neighbor
                 if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index != current_cell_index)
                 {
+                    // Counts the neighbors that are not the cell of interest itself
                     neighbor_count++;
 
                     if (current_cell_index < neighbor_cell_index)
                     {
-                        std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl; 
+                        // Further, if our current cell index is less than this neighbor index, we know we found a unique edge
+                        // and thus set the flag s.t. it will get pushed onto the list
                         unique_neighbor = 1;
                     }
                 }
                 else if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && current_cell_index < neighbor_cell_index)
                 {
-                    //continue;
+                    // If the edge has no neighbors beyond its parent cell, it is on a boundary and hence has not been counted yet
                     unique_neighbor = 1;
                 }
             }
         }
     }
 
-    current_edge.neighbor_count = neighbor_count;
-    current_edge.unique_neighbor = unique_neighbor;
+    current_edge_status.neighbor_count = neighbor_count;
+    current_edge_status.unique_neighbor = unique_neighbor;
 
-    return(current_edge);
-}
-
-int Geometry::findFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
-{
-    int neighbor_count = 0;
-    // Loop over the four (at maximum) cells connected to the edge start vertex
-    for (int jj = 0; jj < 4; ++jj)
-    {
-        int neighbor_cell_index = vertices[edge_start_vert].neighbors[jj];
-
-        // Some vertices don't have neighbors in particular quadrants
-        if (neighbor_cell_index == -1)
-        {
-            //continue;
-        }
-        else
-        {
-            // Loop over vertices of this shared cell 
-            for (int nn = 0; nn < 4; ++nn)
-            {
-                // If this shared cell also possesses the end end vertex and is NOT the cell of interest itself, then the face
-                // has a neighbor
-                if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && neighbor_cell_index != current_cell_index)
-                {
-                    neighbor_count++;
-
-                    if (current_cell_index < neighbor_cell_index)
-                    {
-                        std::cout << "Edge with vertices (" << edge_start_vert << ", " << edge_end_vert << ") is unique." << std::endl; 
-                    }
-                }
-                else
-                {
-                    //continue;
-                }
-            }
-        }
-    }
-    return(neighbor_count);
-}
-
-int Geometry::getFaceNeighbors(int current_cell_index, int edge_start_vert, int edge_end_vert)
-{
-    int unique_neighbor = 0;
-
-    // Loop over the four (at maximum) cells connected to the edge start vertex
-    for (int jj = 0; jj < 4; ++jj)
-    {
-        int neighbor_cell_index = vertices[edge_start_vert].neighbors[jj];
-
-        // Some vertices don't have neighbors in particular quadrants
-        if (neighbor_cell_index == -1)
-        {
-            // continue;
-        }
-        else
-        {
-            // Loop over vertices of this shared cell 
-            for (int nn = 0; nn < 4; ++nn)
-            {
-                // If this shared cell also possesses the end end vertex and is NOT the cell of interest itself, then the face
-                // has a neighbor
-                if (cell_centers[neighbor_cell_index].neighbors[nn] == edge_end_vert && current_cell_index < neighbor_cell_index)
-                {
-                    unique_neighbor = 1;
-                }
-                else
-                {
-
-                }
-            }
-        }
-    }
-    return(unique_neighbor);
+    return(current_edge_status);
 }
 
 void Geometry::generateEdgeList()
@@ -306,15 +223,13 @@ void Geometry::generateEdgeList()
         int sw_vertex_index = cell_centers[ii].neighbors[0];
         int se_vertex_index = cell_centers[ii].neighbors[1];
 
-        //create the edge here
         Edge edge_c;
         edge_c.start_vertex = sw_vertex_index;
         edge_c.end_vertex = se_vertex_index;
 
-        // return a boolean for if edge is unique
-        UniqueEdge current_edge = findUniqueFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
+        UniqueEdgeStatus edge_status = findUniqueFaceNeighbors(ii, sw_vertex_index, se_vertex_index);
 
-        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
+        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
         }
@@ -326,10 +241,9 @@ void Geometry::generateEdgeList()
         edge_c.start_vertex = se_vertex_index;
         edge_c.end_vertex = ne_vertex_index;
 
-        // return a boolean for if edge is unique
-        current_edge = findUniqueFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
+        edge_status = findUniqueFaceNeighbors(ii, se_vertex_index, ne_vertex_index);
 
-        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
+        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
         }
@@ -337,28 +251,23 @@ void Geometry::generateEdgeList()
         // For a North face of the cell, collect the NE and NW vertices as the start and end
         int nw_vertex_index = cell_centers[ii].neighbors[3];
 
-        //create the edge here
         edge_c.start_vertex = ne_vertex_index;
         edge_c.end_vertex = nw_vertex_index;
 
-        // return a boolean for if edge is unique
-        current_edge = findUniqueFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
+        edge_status = findUniqueFaceNeighbors(ii, ne_vertex_index, nw_vertex_index);
 
-        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
+        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
         }
 
         // For a West face of the cell, collect the NW and SW vertices as the start and end
-
-        //create the edge here
         edge_c.start_vertex = nw_vertex_index;
         edge_c.end_vertex = sw_vertex_index;
 
-        // return a boolean for if edge is unique
-        current_edge = findUniqueFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
+        edge_status = findUniqueFaceNeighbors(ii, nw_vertex_index, sw_vertex_index);
 
-        if (current_edge.neighbor_count == 0 || current_edge.unique_neighbor == 1)
+        if (edge_status.neighbor_count == 0 || edge_status.unique_neighbor == 1)
         {
             edge_list.push_back(edge_c);
         }
@@ -368,11 +277,6 @@ void Geometry::generateEdgeList()
 void Geometry::writeEdgeList()
 {
     int num_edges = edge_list.size();
-    // Loop over all cells
-    for (int ii = 0; ii < num_edges; ++ii)
-    {
-        std::cout << "Edge #: " << ii << "; Vertices: (" << edge_list[ii].start_vertex << ", " << edge_list[ii].end_vertex << ")" << std::endl;
-    }
 
     std::ofstream edge_list_output;
     edge_list_output.open("edge_list.dat");
