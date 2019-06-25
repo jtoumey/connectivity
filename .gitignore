@@ -1,6 +1,15 @@
 # Binaries
 *.o
 *.out
+/src/connectivity
+
+# CMake
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles
+
+# Makefile
+src/Makefile
 
 # Data Files
 *.dat
