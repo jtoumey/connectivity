@@ -4,4 +4,4 @@ set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 project (connectivity)
-add_executable(connectivity cnct.cpp geometry.cpp)
+add_executable(connectivity cnct.cpp geometry.cpp tools/kdtree.cpp)
