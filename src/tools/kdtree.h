@@ -9,7 +9,7 @@ public:
     T coordinates[k];
 };
 
-template<typename T> class KdNode
+template<typename T, typename S> class KdNode
 {
 private:
 
@@ -28,7 +28,7 @@ public:
 template<typename T> class KdTree
 {
 private:
-    KdNode<T> root;
+    S KdNode root;
 
 public:
     KdTree();
